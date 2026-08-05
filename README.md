@@ -65,6 +65,14 @@ Kilo  ──webhook(POST)──▶  kilo-channel(HTTP :8090)
                             Kilo  ←── 自动回复
 ```
 
+### 前置条件
+
+使用本连接器前，请先下载并安装 **Kilo** 客户端：
+
+👉 https://www.aurora-wave.com/kilo/index.html
+
+安装并启动 Kilo 后，才能进行后续的 webhook 与 MCP 配置。
+
 ### 安装
 
 需要 Node.js 18+。克隆仓库后安装依赖：
@@ -197,6 +205,14 @@ Kilo  ──webhook(POST)──▶  kilo-channel(HTTP :8090)
                               ▼
                             Kilo  ←── auto reply
 ```
+
+### Prerequisites
+
+Before using this connector, download and install the **Kilo** client first:
+
+👉 https://www.aurora-wave.com/kilo/index.html
+
+After installing and launching Kilo, you can proceed with the webhook and MCP setup below.
 
 ### Install
 
