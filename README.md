@@ -90,6 +90,14 @@ Kilo  ──webhook(POST)──▶  kilo-channel(HTTP :8090)
 
    这里的 `39179` 就是 Kilo MCP 服务监听的端口（每台机器可能不同，请以你本地文件为准）。
 
+   > ⚠️ **注意：`config.json` 不是严格的 JSON 文件**。它开头带有 `//` 注释行，直接交给
+   > `JSON.parse` / `json.load` 会报错（`Expecting value: line 1 column 1`）。若用程序/AI 读取，
+   > 请先去掉 `//` 注释，或用下面这条命令可靠地取出端口号：
+   >
+   > ```bash
+   > grep -o '"mcp_port"[[:space:]]*:[[:space:]]*[0-9]*' ~/.kilo/backend/config.json | grep -o '[0-9]*'
+   > ```
+
 2. **读取 API Key** —— 打开 `~/.kilo/backend/.api_key.json`，它是一个数组，取其中对象的 `key` 字段：
 
    ```json
@@ -285,6 +293,14 @@ first connect that MCP server to WorkBuddy, which requires two parameters: the *
    ```
 
    `39179` is the port Kilo's MCP server listens on (it differs per machine — use your local value).
+
+   > ⚠️ **Note: `config.json` is NOT strict JSON.** It begins with `//` comment lines, so passing it
+   > to `JSON.parse` / `json.load` throws (`Expecting value: line 1 column 1`). If a program/AI reads
+   > it, strip the `//` comments first, or use this command to extract the port reliably:
+   >
+   > ```bash
+   > grep -o '"mcp_port"[[:space:]]*:[[:space:]]*[0-9]*' ~/.kilo/backend/config.json | grep -o '[0-9]*'
+   > ```
 
 2. **Read the API key** — open `~/.kilo/backend/.api_key.json`, an array; take the `key` field of
    an object:
