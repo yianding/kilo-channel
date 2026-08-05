@@ -23,6 +23,7 @@ automatically replies using the Kilo MCP tools — closing the loop "Kilo receiv
   - [在 WorkBuddy 中注册](#在-workbuddy-中注册)
   - [配置 Kilo 的 webhook](#配置-kilo-的-webhook)
   - [验证配置是否生效](#验证配置是否生效)
+  - [测试 Kilo MCP 是否配置成功](#测试-kilo-mcp-是否配置成功)
   - [端口冲突说明](#端口冲突说明)
   - [常见问题排查](#常见问题排查)
 - [English Guide](#english-guide)
@@ -35,6 +36,7 @@ automatically replies using the Kilo MCP tools — closing the loop "Kilo receiv
   - [Register in WorkBuddy](#register-in-workbuddy)
   - [Configure Kilo webhook](#configure-kilo-webhook)
   - [Verify it works](#verify-it-works)
+  - [Test that the Kilo MCP server is configured](#test-that-the-kilo-mcp-server-is-configured)
   - [Port conflicts](#port-conflicts)
   - [Troubleshooting](#troubleshooting)
 
@@ -238,6 +240,21 @@ http://127.0.0.1:<端口>
 
 > 提示：Claude Code / CodeBuddy 这类 CLI 助手，只有在会话里加载了 `kilo` MCP 服务器（见上文
 > 「获取 Kilo MCP 连接参数」）才会具备 `kilo_*` 工具。若没加载，请先按前文配置好再测试。
+
+### 测试 Kilo MCP 是否配置成功
+
+上面验证的是「转发 + 自动回复」整条链路。如果你只想单独确认 **`kilo` MCP 服务器本身是否已正确接入**（即 AI 是否真的拿到了 `kilo_*` 工具），可以用下面这条指令测试：
+
+在加载了 `kilo` MCP 的会话里，直接对 AI 说：
+
+> 「请用 kilo mcp 查看一下我的好友列表，并且给每一个好友发送打招呼的消息」
+
+判断结果：
+
+- ✅ **AI 成功列出好友并发出了打招呼消息** —— 说明 `kilo` MCP 服务器配置正确，`kilo_list_contacts` 与 `kilo_send_message` 等工具都可用，配置成功。
+- ❌ **AI 说找不到 kilo 相关工具 / 无法调用** —— 说明 `kilo` MCP 服务器没加载或鉴权失败。请回头检查「获取 Kilo MCP 连接参数」一节：`mcp_port` 是否填对、`Authorization` 的 Bearer Token（API Key）是否有效、配置后是否重启了 WorkBuddy / Claude Code 让新配置生效。
+
+> 这条测试不依赖手机，只要电脑上的 Kilo 正在运行、且 `kilo` MCP 已接入，就能独立验证。
 
 ### 端口冲突说明
 
@@ -480,6 +497,28 @@ Confirm the full loop "phone sends → computer auto-replies" with these steps:
 > Tip: CLI assistants like Claude Code / CodeBuddy only gain the `kilo_*` tools when the `kilo` MCP
 > server is loaded in the session (see "Get Kilo MCP connection params" above). If it isn't loaded,
 > configure it first, then test again.
+
+### Test that the Kilo MCP server is configured
+
+The steps above verify the whole "forwarding + auto-reply" loop. If you only want to confirm that
+the **`kilo` MCP server itself is correctly connected** (i.e. the AI actually has the `kilo_*` tools),
+use this test instruction:
+
+In a session where the `kilo` MCP is loaded, simply tell the AI:
+
+> "Please use the kilo mcp to view my friend list, and send a greeting message to every friend."
+
+How to read the result:
+
+- ✅ **The AI lists your friends and sends the greetings** — the `kilo` MCP server is configured
+  correctly; `kilo_list_contacts`, `kilo_send_message`, etc. are all available. Success.
+- ❌ **The AI says it can't find the kilo tools / can't call them** — the `kilo` MCP server isn't
+  loaded or auth failed. Re-check "Get Kilo MCP connection params": is `mcp_port` correct, is the
+  Bearer token (API key) valid, and did you restart WorkBuddy / Claude Code so the new config takes
+  effect?
+
+> This test doesn't need a phone — as long as Kilo is running on the computer and the `kilo` MCP is
+> connected, it verifies the setup on its own.
 
 ### Port conflicts
 
