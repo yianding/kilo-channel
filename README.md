@@ -199,8 +199,14 @@ node kilo-channel.mjs
 }
 ```
 
-> 若要让 WorkBuddy 在启动时自动加载为 channel，可用：
-> `codebuddy --channels server:kilo-channel`
+> 若要让 WorkBuddy 在启动时自动加载为 channel，请用下面格式启动（以 macOS 为例）：
+>
+> ```bash
+> /Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/cli/bin/codebuddy --channels server:kilo-channel
+> ```
+>
+> 其它平台把 `codebuddy` 换成你实际的 WorkBuddy 可执行文件（CLI）路径即可，参数统一为 `--channels server:kilo-channel`。
+> 启动后，Kilo 推送的消息就会经 `kilo-channel` 转发给 WorkBuddy 的 AI 自动处理。
 
 ### 配置 Kilo 的 webhook
 
@@ -408,8 +414,15 @@ Add the following to WorkBuddy's MCP config (usually `~/.workbuddy/mcp.json`):
 }
 ```
 
-> To have WorkBuddy load it as a channel on startup, run:
-> `codebuddy --channels server:kilo-channel`
+> To have WorkBuddy load it as a channel on startup, launch it with this format (macOS example):
+>
+> ```bash
+> /Applications/WorkBuddy.app/Contents/Resources/app.asar.unpacked/cli/bin/codebuddy --channels server:kilo-channel
+> ```
+>
+> On other platforms, replace `codebuddy` with your actual WorkBuddy CLI executable path — the flag
+> is always `--channels server:kilo-channel`. Once started, Kilo's pushed messages are forwarded via
+> `kilo-channel` to WorkBuddy's AI for automatic handling.
 
 ### Configure Kilo webhook
 
