@@ -1,0 +1,19 @@
+{
+  "name": "kilo-channel",
+  "version": "1.0.0",
+  "description": "Kilo Channel MCP connector for WorkBuddy — forwards Kilo webhook messages to WorkBuddy",
+  "type": "module",
+  "main": "kilo-channel.mjs",
+  "bin": {
+    "kilo-channel": "kilo-channel.mjs"
+  },
+  "scripts": {
+    "start": "node kilo-channel.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

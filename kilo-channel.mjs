@@ -10,9 +10,14 @@
  * 4. WorkBuddy 的 AI 会自动处理消息，并通过已加载的 Kilo MCP 工具发送回复
  * 
  * 使用方法：
- * 1. 在 ~/.workbuddy/mcp.json 中注册此 channel
- * 2. 配置 Kilo 的 webhook_url 为 http://127.0.0.1:8090
+ * 1. 在 mcp.json 中注册此 channel（路径见下方 CONFIG_FILE 说明）
+ * 2. 配置 Kilo 的 webhook_url 为本服务监听地址（端口见下方 WEBHOOK_PORT 说明）
  * 3. 启动 WorkBuddy 时加载 channel：codebuddy --channels server:kilo-channel
+ *
+ * 环境变量（均可选，均有默认值）：
+ *   KILO_CHANNEL_PORT    监听端口，默认 8090
+ *   KILO_CHANNEL_CONFIG  Kilo 配置文件路径，默认 $HOME/.workbuddy/mcp.json
+ *   KILO_MCP_URL         Kilo MCP 服务地址，默认 http://127.0.0.1:9090/mcp
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -22,8 +27,10 @@ import fs from 'fs'
 
 // ============ 配置 ============
 const CHANNEL_NAME = 'kilo'
-const WEBHOOK_PORT = 8090
-const CONFIG_FILE = '/Users/yianding/.workbuddy/mcp.json'
+const WEBHOOK_PORT = parseInt(process.env.KILO_CHANNEL_PORT || '8090', 10)
+const KILO_MCP_URL = process.env.KILO_MCP_URL || 'http://127.0.0.1:9090/mcp'
+const CONFIG_FILE = process.env.KILO_CHANNEL_CONFIG ||
+  `${(process.env.HOME || process.env.USERPROFILE || '')}/.workbuddy/mcp.json`
 
 // ============ 从配置文件读取 Kilo 配置 ============
 
@@ -34,11 +41,11 @@ function loadKiloConfig() {
     const token = kiloConf.headers.Authorization
     return {
       token: token.startsWith('Bearer ') ? token.slice(7) : token,
-      url: kiloConf.url || 'http://127.0.0.1:9090/mcp'
+      url: kiloConf.url || KILO_MCP_URL
     }
   } catch (e) {
     console.error('[Kilo Channel] 读取配置文件失败:', e.message)
-    return { token: '', url: 'http://127.0.0.1:9090/mcp' }
+    return { token: '', url: KILO_MCP_URL }
   }
 }
 
