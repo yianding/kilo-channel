@@ -22,6 +22,7 @@ automatically replies using the Kilo MCP tools — closing the loop "Kilo receiv
   - [环境变量](#环境变量)
   - [在 WorkBuddy 中注册](#在-workbuddy-中注册)
   - [配置 Kilo 的 webhook](#配置-kilo-的-webhook)
+  - [验证配置是否生效](#验证配置是否生效)
   - [端口冲突说明](#端口冲突说明)
   - [常见问题排查](#常见问题排查)
 - [English Guide](#english-guide)
@@ -33,6 +34,7 @@ automatically replies using the Kilo MCP tools — closing the loop "Kilo receiv
   - [Environment variables](#environment-variables)
   - [Register in WorkBuddy](#register-in-workbuddy)
   - [Configure Kilo webhook](#configure-kilo-webhook)
+  - [Verify it works](#verify-it-works)
   - [Port conflicts](#port-conflicts)
   - [Troubleshooting](#troubleshooting)
 
@@ -218,6 +220,24 @@ http://127.0.0.1:<端口>
 
 默认端口为 `8090`，即 `http://127.0.0.1:8090`。如果你通过 `KILO_CHANNEL_PORT`
 改了端口，这里也要对应修改。
+
+### 验证配置是否生效
+
+按以下步骤确认整条链路「手机发消息 → 电脑自动回复」跑通：
+
+1. **手机安装并登录 Kilo**：在手机上安装好 Kilo（iOS / Android），并登录你的账号。
+2. **手机添加电脑 Kilo 为好友**：在手机端把**电脑上运行的 Kilo** 加为好友（用电脑端 Kilo 的 Solana 地址 / 二维码添加）。
+3. **从手机给电脑 Kilo 发消息**：在手机端给「电脑上的 Kilo」这个好友发一条消息。
+4. **观察电脑端是否自动回复**：看运行 WorkBuddy / Claude Code 的电脑上，AI 是否通过 `kilo-channel` 收到这条消息并自动用 `kilo_send_message` 回复发回手机。
+
+   - ✅ **收到并回复**：说明 `kilo-channel` 转发、WorkBuddy 加载 `kilo` MCP 工具、Kilo webhook 全部正常，闭环成功。
+   - ❌ **没收到 / 没回复**：大概率是 AI 没意识到要用 Kilo 工具回消息。此时**在手机发送的消息里直接告诉 AI**，例如：
+     > 「请用 kilo mcp 回复这条消息」
+     
+     这样 AI 会明确调用 `kilo_*` 工具（如 `kilo_send_message`）把内容发回你的手机。
+
+> 提示：Claude Code / CodeBuddy 这类 CLI 助手，只有在会话里加载了 `kilo` MCP 服务器（见上文
+> 「获取 Kilo MCP 连接参数」）才会具备 `kilo_*` 工具。若没加载，请先按前文配置好再测试。
 
 ### 端口冲突说明
 
@@ -434,6 +454,32 @@ http://127.0.0.1:<port>
 
 The default port is `8090`, i.e. `http://127.0.0.1:8090`. If you changed it via
 `KILO_CHANNEL_PORT`, update this URL accordingly.
+
+### Verify it works
+
+Confirm the full loop "phone sends → computer auto-replies" with these steps:
+
+1. **Install & sign in on phone**: install Kilo on your phone (iOS / Android) and sign in.
+2. **Add the computer's Kilo as a friend**: on the phone, add the **Kilo running on your computer**
+   as a friend (use the computer Kilo's Solana address / QR code).
+3. **Send a message from phone to computer Kilo**: on the phone, send a message to that "computer
+   Kilo" friend.
+4. **Watch the computer auto-reply**: on the computer running WorkBuddy / Claude Code, check whether
+   the AI received the message via `kilo-channel` and automatically replied using
+   `kilo_send_message` back to the phone.
+
+   - ✅ **Received & replied** — `kilo-channel` forwarding, WorkBuddy's `kilo` MCP tools, and the
+     Kilo webhook are all working; the loop is closed.
+   - ❌ **No reply / not received** — most likely the AI didn't realize it should reply via Kilo.
+     In that case, **tell the AI explicitly in the message you send from the phone**, e.g.:
+     > "Please reply to this message using the kilo mcp"
+     
+     The AI will then call the `kilo_*` tools (e.g. `kilo_send_message`) to send the content back
+     to your phone.
+
+> Tip: CLI assistants like Claude Code / CodeBuddy only gain the `kilo_*` tools when the `kilo` MCP
+> server is loaded in the session (see "Get Kilo MCP connection params" above). If it isn't loaded,
+> configure it first, then test again.
 
 ### Port conflicts
 
