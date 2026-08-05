@@ -17,6 +17,7 @@ automatically replies using the Kilo MCP tools — closing the loop "Kilo receiv
   - [功能简介](#功能简介)
   - [工作原理](#工作原理)
   - [安装](#安装)
+  - [获取 Kilo MCP 连接参数（API Key 与端口）](#获取-kilo-mcp-连接参数api-key-与端口)
   - [运行](#运行)
   - [环境变量](#环境变量)
   - [在 WorkBuddy 中注册](#在-workbuddy-中注册)
@@ -27,6 +28,7 @@ automatically replies using the Kilo MCP tools — closing the loop "Kilo receiv
   - [Overview](#overview)
   - [How it works](#how-it-works)
   - [Install](#install)
+  - [Get Kilo MCP connection params (API key & port)](#get-kilo-mcp-connection-params-api-key--port)
   - [Run](#run)
   - [Environment variables](#environment-variables)
   - [Register in WorkBuddy](#register-in-workbuddy)
@@ -72,6 +74,57 @@ Kilo  ──webhook(POST)──▶  kilo-channel(HTTP :8090)
 👉 https://www.aurora-wave.com/kilo/index.html
 
 安装并启动 Kilo 后，才能进行后续的 webhook 与 MCP 配置。
+
+### 获取 Kilo MCP 连接参数（API Key 与端口）
+
+`kilo-channel` 只做消息转发，真正能调用 `kilo_send_message`、`kilo_list_contacts` 等工具的是 Kilo 自带的 **Kilo MCP 服务器**。要让 WorkBuddy 能调用这些工具，需要先把该 MCP 服务器接入 WorkBuddy，而接入需要两个参数：**API Key** 和 **MCP 端口号**。这两个参数都保存在 Kilo 本地数据目录下的 `backend` 文件夹（默认 `~/.kilo/backend`，Linux 为 `$HOME/.kilo/backend`，Windows 为 `%USERPROFILE%\.kilo\backend`）。
+
+1. **读取 MCP 端口号** —— 打开 `~/.kilo/backend/config.json`，取其中的 `mcp_port` 字段：
+
+   ```json
+   {
+     "mcp_port": 39179
+     // ... 其它字段省略
+   }
+   ```
+
+   这里的 `39179` 就是 Kilo MCP 服务监听的端口（每台机器可能不同，请以你本地文件为准）。
+
+2. **读取 API Key** —— 打开 `~/.kilo/backend/.api_key.json`，它是一个数组，取其中对象的 `key` 字段：
+
+   ```json
+   [
+     {
+       "name": "Kilo",
+       "remark": "autogen",
+       "expiry": "2100-01-01T00:00:00Z",
+       "key": "<你的 API Key>"
+     }
+   ]
+   ```
+
+   把 `key` 的值作为后续配置里的 Bearer Token 使用（注意 `.api_key.json` 是隐藏文件，需开启「显示隐藏文件」才能看到）。
+
+3. **配置 Kilo MCP 服务器** —— 在 WorkBuddy 的 MCP 配置文件（通常为 `~/.workbuddy/mcp.json`）的 `mcpServers` 中加入以下内容，把端口和 key 替换成你上一步读到的值：
+
+   ```json
+   {
+     "mcpServers": {
+       "kilo": {
+         "type": "http",
+         "url": "http://127.0.0.1:39179/",
+         "headers": {
+           "Authorization": "Bearer <你的 API Key>"
+         },
+         "disabled": false
+       }
+     }
+   }
+   ```
+
+   配置完成后，WorkBuddy 即可通过 `kilo_*` 系列工具操作你的 Kilo 账号，配合 `kilo-channel` 实现「Kilo 收消息 → WorkBuddy 自动回」的闭环。
+
+> 提示：`~/.kilo` 是 Kilo 的默认数据目录。若你安装时修改过数据目录，请在对应的实际目录下寻找 `config.json` 与 `.api_key.json`。
 
 ### 安装
 
@@ -213,6 +266,66 @@ Before using this connector, download and install the **Kilo** client first:
 👉 https://www.aurora-wave.com/kilo/index.html
 
 After installing and launching Kilo, you can proceed with the webhook and MCP setup below.
+
+### Get Kilo MCP connection params (API key & port)
+
+`kilo-channel` only forwards messages. The actual `kilo_send_message`, `kilo_list_contacts`, etc.
+tools come from Kilo's built-in **Kilo MCP server**. To let WorkBuddy call those tools you must
+first connect that MCP server to WorkBuddy, which requires two parameters: the **API key** and the
+**MCP port number**. Both live in Kilo's local data directory under the `backend` folder
+(default `~/.kilo/backend` on macOS/Linux, `%USERPROFILE%\.kilo\backend` on Windows).
+
+1. **Read the MCP port** — open `~/.kilo/backend/config.json` and take the `mcp_port` field:
+
+   ```json
+   {
+     "mcp_port": 39179
+     // ... other fields omitted
+   }
+   ```
+
+   `39179` is the port Kilo's MCP server listens on (it differs per machine — use your local value).
+
+2. **Read the API key** — open `~/.kilo/backend/.api_key.json`, an array; take the `key` field of
+   an object:
+
+   ```json
+   [
+     {
+       "name": "Kilo",
+       "remark": "autogen",
+       "expiry": "2100-01-01T00:00:00Z",
+       "key": "<your API key>"
+     }
+   ]
+   ```
+
+   Use the `key` value as the Bearer token in the next step (`.api_key.json` is a hidden file —
+   enable "show hidden files" to see it).
+
+3. **Configure the Kilo MCP server** — add the following to the `mcpServers` block of WorkBuddy's
+   MCP config (usually `~/.workbuddy/mcp.json`), replacing the port and key with your values:
+
+   ```json
+   {
+     "mcpServers": {
+       "kilo": {
+         "type": "http",
+         "url": "http://127.0.0.1:39179/",
+         "headers": {
+           "Authorization": "Bearer <your API key>"
+         },
+         "disabled": false
+       }
+     }
+   }
+   ```
+
+   Once configured, WorkBuddy can drive your Kilo account via the `kilo_*` tools, and together with
+   `kilo-channel` closes the loop "Kilo receives → WorkBuddy replies".
+
+> Tip: `~/.kilo` is Kilo's default data directory. If you changed it at install time, look for
+> `config.json` and `.api_key.json` in your actual data directory instead.
 
 ### Install
 
