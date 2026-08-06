@@ -14,6 +14,8 @@ automatically replies using the Kilo MCP tools — closing the loop "Kilo receiv
 ## 目录 / Table of Contents
 
 - [中文说明](#中文说明)
+  - [什么是 Kilo](#什么是-kilo)
+  - [什么是 kilo-channel](#什么是-kilo-channel)
   - [功能简介](#功能简介)
   - [工作原理](#工作原理)
   - [安装](#安装)
@@ -27,6 +29,8 @@ automatically replies using the Kilo MCP tools — closing the loop "Kilo receiv
   - [端口冲突说明](#端口冲突说明)
   - [常见问题排查](#常见问题排查)
 - [English Guide](#english-guide)
+  - [What is Kilo](#what-is-kilo)
+  - [What is kilo-channel](#what-is-kilo-channel)
   - [Overview](#overview)
   - [How it works](#how-it-works)
   - [Install](#install)
@@ -43,6 +47,31 @@ automatically replies using the Kilo MCP tools — closing the loop "Kilo receiv
 ---
 
 ## 中文说明
+
+### 什么是 Kilo
+
+**Kilo 是一款去中心化的 P2P 即时通讯软件。**
+
+- **界面 / 客户端**：基于 Kotlin Multiplatform Compose 实现，覆盖 Android、iOS、桌面（JVM）多端。
+- **后端守护进程**：一个 Go 语言编写的守护进程（`kilo-message`），负责 libp2p 网络、内置 IPFS（Kubo）、Kademlia DHT 好友发现、离线消息存储与端到端加密。
+- **两端通信**：客户端与守护进程通过 **localhost gRPC** 通信，使用 Bearer Token + 可选 mTLS 鉴权。
+- **核心能力**：1:1 私聊、群组频道（pubsub）、WebRTC 语音/视频通话、P2P/IPFS 文件传输、sing-box VPN 等。
+
+> 下载安装见：https://www.aurora-wave.com/kilo/index.html
+
+### 什么是 kilo-channel
+
+**kilo-channel 是让 AI Agent 通过 MCP 使用 Kilo 的桥接组件。**
+
+Kilo 守护进程自带一个 **Kilo MCP 服务器**，向外提供 `kilo_list_contacts`、`kilo_send_message`、`kilo_read_messages` 等工具——任何支持 MCP 的 AI Agent（如 WorkBuddy、Claude Code）只要加载这个服务器，就能读写你的 Kilo 账号。
+
+而 kilo-channel 是配套的 **Channel 连接器**：它把 Kilo 收到的私聊消息通过本地 webhook 实时转发给 AI Agent，让 Agent 在「收到消息」的瞬间自动调用 Kilo MCP 工具把回复发回 Kilo，从而形成完整的闭环：
+
+```
+Kilo 收消息 → kilo-channel 转发 → AI Agent 调用 Kilo MCP 工具 → 自动回复到 Kilo
+```
+
+简单说：**Kilo 是你的通讯软件，kilo-channel + Kilo MCP 让你手里的 AI Agent 能帮你自动收发 Kilo 消息。**
 
 ### 功能简介
 
@@ -280,6 +309,39 @@ http://127.0.0.1:<端口>
 ---
 
 ## English Guide
+
+### What is Kilo
+
+**Kilo is a decentralized, peer-to-peer instant messenger.**
+
+- **UI / client**: built with Kotlin Multiplatform Compose, running on Android, iOS, and Desktop (JVM).
+- **Backend daemon**: a Go daemon (`kilo-message`) that handles the libp2p network, embedded IPFS (Kubo),
+  Kademlia DHT friend discovery, offline message storage, and end-to-end encryption.
+- **Client ↔ daemon**: the client talks to the daemon over **localhost gRPC**, authenticated with a Bearer
+  token (+ optional mTLS).
+- **Core features**: 1:1 private chat, group channels (pubsub), WebRTC voice/video calls, P2P/IPFS file
+  transfer, sing-box VPN, and more.
+
+> Download & install: https://www.aurora-wave.com/kilo/index.html
+
+### What is kilo-channel
+
+**kilo-channel is the bridge that lets an AI agent use Kilo through MCP.**
+
+Kilo's daemon ships a built-in **Kilo MCP server**, exposing tools like `kilo_list_contacts`,
+`kilo_send_message`, and `kilo_read_messages`. Any MCP-capable AI agent (WorkBuddy, Claude Code, …) that
+loads this server can read and write your Kilo account.
+
+kilo-channel is the companion **Channel connector**: it forwards private messages Kilo receives to the AI
+agent over a local webhook, so the agent can, the moment it gets a message, call the Kilo MCP tools to send
+the reply back — closing the full loop:
+
+```
+Kilo receives → kilo-channel forwards → AI agent calls Kilo MCP tools → auto-reply to Kilo
+```
+
+In short: **Kilo is your messaging app; kilo-channel + the Kilo MCP server let the AI agent in your hands
+automatically send and receive your Kilo messages.**
 
 ### Overview
 
